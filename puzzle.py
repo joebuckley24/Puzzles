@@ -1,5 +1,7 @@
 import numpy as np
 import pandas as pd
+import random
+import copy
 STATES = pd.read_csv("states_pops.csv")
 SOLUTION = ""
 
@@ -66,10 +68,66 @@ def def_distr():
 	probs = np.fromiter(counts.values(), dtype=float) / sum(counts.values())
 	return letters, probs
 
+def def_cond_distr():
+	counts = {}
+	for stt in STATES.state:
+		for i, ch in enumerate(stt):
+			if ch not in counts:
+				counts[ch] = {}
+			if i > 0:
+				left = stt[i-1]
+				if left not in counts[ch]:
+					counts[ch][left] = 1
+				else:
+					counts[ch][left] += 1
+			if i < len(stt)-1:
+				right = stt[i+1]
+				if right not in counts[ch]:
+					counts[ch][right] = 1
+				else:
+					counts[ch][right] += 1
+	# for el in counts:
+	# 	counts[el] = (
+	# 		np.fromiter(counts[el].keys(), dytpe=object),
+	# 		np.fromiter(counts[el].values(), dtype=float)
+	# 	)
+	return counts
+
 def gen_cand(letters, probs):
 	return "".join(np.random.choice(letters, 25, p=probs))
 
+def gen_muttn(letters, probs):
+	return "".join(np.random.choice(letters, 1, p=probs))
+
+def mutate(cand, cond_distr):
+	i, j = divmod(random.choice(range(25)))
+	counts = {}
+	for di, dj in [(-1,1), (0,1), (1,1), (1,0), (1,-1), (0,-1), (-1,-1), (-1,0)]:
+		i_ = i + di
+		j_ = j + dj
+		if i_ >= 0 and i_ < 5 and j_ >= 0 and j_ < 5:
+			neighb = cand[i][j]
+			for el, count in cond_distr[neighb]:
+				if el not in counts:
+					counts[el] = count
+				else:
+					counts[el] += count
+	letters = np.fromiter(counts.keys(), dtype=object)
+	probs = np.fromiter(counts.values(), dtype=float) / sum(counts.values())
+	cand[i][j] = "".join(np.random.choice(letters, 1, p=probs))
+
+def crossover(cand1, cand2):
+	i, j = divmod(random.randrange(23), 5)
+	cand1_ = [cand1[row][:] if row < i else 
+			  cand1[row][:j+1] + cand2[row][j+1:] if row == i else 
+			  cand2[row][:] for row in range(5)]
+	cand2_ = [cand2[row][:] if row < i else 
+			  cand2[row][:j+1] + cand1[row][j+1:] if row == i else 
+			  cand1[row][:] for row in range(5)]
+	return cand1_, cand2_
+
 def print_board(s25):
+	s25 = s25.upper()
 	for n in range(5):
 		print("    " + s25[5*n:5*(n+1)])
 
@@ -78,12 +136,12 @@ def print_scores(dic):
 		print(f"{k}: {v}")
 
 if __name__ == "__main__":
-	answer = \
-	"tho__" + \
-	"ain__" + \
-	"esl__" + \
-	"_____" + \
-	"_____"
+	# answer = \
+	# "tho__" + \
+	# "ain__" + \
+	# "esl__" + \
+	# "_____" + \
+	# "_____"
 	# scr = score(answer)
 	# print(scr)
 	# print(sum(scr.values()))
