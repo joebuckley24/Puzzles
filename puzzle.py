@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 STATES = pd.read_csv("states_pops.csv")
 SOLUTION = ""
@@ -19,7 +20,6 @@ def find_states(answer):
 		for j in range(5):
 			find_states_bysq(board, i, j, "", [True]*50, [True]*50, poss_states_bysq[i][j], str(i)+str(j)+" ")
 	return poss_states_bysq
-
 
 def find_states_bysq(board, i, j, s, poss, perf, ansr_ij, ij_path):
 	poss_ = poss[:]
@@ -54,40 +54,31 @@ def find_states_bysq(board, i, j, s, poss, perf, ansr_ij, ij_path):
 			if i_ >= 0 and i_ < 5 and j_ >= 0 and j_ < 5:
 				find_states_bysq(board, i_, j_, s+board[i][j], poss_, perf_, ansr_ij, ij_path+str(i_)+str(j_)+" ")
 
-# def valid_state_path(s, i, j):
-# 	for di, dj in [(-1,1), (0,1), (1,1), (1,0), (1,-1), (0,-1), (-1,-1), (-1,0)]:
-# 		i_new = i + di
-# 		j_new = j + dj
-# 		if i_new >= 0 and i_new < 5:
-# 			if j_new >= 0 and j_new < 5:
-# 				valid_state_string(SOLUTION[i_new, j_new])
-# 				try_path(i_new, j_new)
-# 		else:
-# 			continue
+def def_distribution():
+	counts = {}
+	for stt in STATES.state:
+		for ch in stt:
+			if ch in counts:
+				counts[ch] += 1
+			else:
+				counts[ch] = 1
+	letters = np.fromiter(counts.keys(), '|S1')
+	probs = np.fromiter(counts.values(), dtype=float) / sum(counts.values())
+	return letters, probs
 
-# 		j += dj
-
-# def valid_state_string(s):
-# 	poss = [True]*50
-# 	perf = [True]*50
-# 	for i, ch in enumerate(s):
-# 		valid_state_char(ch, i, poss, perf)
-# 		if not any(poss):
-# 			break
-# 	return poss
-
-# def valid_state_char(ch, i, poss, perf):
-# 	for n in range(50):
-# 		if poss[n]:
-# 			if STATES.at[n,"state"][i] != ch:
-# 				if perf[n]:
-# 					perf[n] = False
-# 				else:
-# 					poss[n] = False
+def generate_candidate(letters, probs):
+	return np.random.choice(letters, (5,5), p=probs)
 
 if __name__ == "__main__":
-	answer = "thoaaainaaeslaaaaaaaaaaaa"
-	answer = "tho__ain__esl____________"
+	answer = \
+	"tho__" + \
+	"ain__" + \
+	"esl__" + \
+	"_____" + \
+	"_____"
 	score = score_answer(answer)
 	print(score)
 	print(sum(score.values()))
+
+	letters, probs = def_distribution()
+	c = generate_candidate(letters, probs)
