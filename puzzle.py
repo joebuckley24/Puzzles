@@ -3,7 +3,7 @@ import pandas as pd
 STATES = pd.read_csv("states_pops.csv")
 SOLUTION = ""
 
-def score_answer(answer):
+def score(answer):
 	poss_states = find_states(answer)
 	score = {}
 	for row in poss_states:
@@ -54,7 +54,7 @@ def find_states_bysq(board, i, j, s, poss, perf, ansr_ij, ij_path):
 			if i_ >= 0 and i_ < 5 and j_ >= 0 and j_ < 5:
 				find_states_bysq(board, i_, j_, s+board[i][j], poss_, perf_, ansr_ij, ij_path+str(i_)+str(j_)+" ")
 
-def def_distribution():
+def def_distr():
 	counts = {}
 	for stt in STATES.state:
 		for ch in stt:
@@ -62,12 +62,20 @@ def def_distribution():
 				counts[ch] += 1
 			else:
 				counts[ch] = 1
-	letters = np.fromiter(counts.keys(), '|S1')
+	letters = np.fromiter(counts.keys(), dtype=object)
 	probs = np.fromiter(counts.values(), dtype=float) / sum(counts.values())
 	return letters, probs
 
-def generate_candidate(letters, probs):
-	return np.random.choice(letters, (5,5), p=probs)
+def gen_cand(letters, probs):
+	return "".join(np.random.choice(letters, 25, p=probs))
+
+def print_board(s25):
+	for n in range(5):
+		print("    " + s25[5*n:5*(n+1)])
+
+def print_scores(dic):
+	for k,v in dic.items():
+		print(f"{k}: {v}")
 
 if __name__ == "__main__":
 	answer = \
@@ -76,9 +84,22 @@ if __name__ == "__main__":
 	"esl__" + \
 	"_____" + \
 	"_____"
-	score = score_answer(answer)
-	print(score)
-	print(sum(score.values()))
+	# scr = score(answer)
+	# print(scr)
+	# print(sum(scr.values()))
 
-	letters, probs = def_distribution()
-	c = generate_candidate(letters, probs)
+	letters, probs = def_distr()
+	pos_scores = []
+	for i in range(100_000):
+		cand = gen_cand(letters, probs)
+		scrs = score(cand)
+		scr = sum(scrs.values())
+		if scr > 0:
+			pos_scores.append((cand,scrs,scr))
+
+	top5 = sorted(pos_scores, key=lambda t: t[2], reverse=True)[:5]
+	for i in range(5):
+		print_board(top5[i][0])
+		print_scores(top5[i][1])
+		print(top5[i][2])
+		print("")
