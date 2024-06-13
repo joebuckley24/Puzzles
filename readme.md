@@ -34,9 +34,13 @@ The genetic algorithm is inspired by natural selection in the biological world, 
 After a few hours of running the code, our best string was 
 
 > WTIMA
+> 
 > ENSVF
+> 
 > KOALI
+> 
 > RCSRO
+> 
 > ENAIN
 
 giving us a score of 188,652,076.
