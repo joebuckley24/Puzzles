@@ -1,8 +1,6 @@
-# Altered States 2 #
+# My Solution to Jane Street 06/2024 Puzzle, "Altered States 2" ##
 
-## Jane Street 06/2024 Puzzle solved by Joe Buckley ##
-
-Please go to the June 2024 entry in Jane Street's [Puzzle Archive](https://www.janestreet.com/puzzles/archive/ "archive") for the official prompt and other months' puzzles.
+Please go to the June 2024 entry in Jane Street's [Puzzle Archive](https://www.janestreet.com/puzzles/altered-states-2-index/ "archive") for the official prompt and other months' puzzles.
 
 ![5x5 blank grid and 3x3 example grid](june-2024.png "Example photo")
 
